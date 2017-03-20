@@ -1,0 +1,20 @@
+{
+  "name": "eviratec-auth-svc",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./bin/svc-eviratec-auth"
+  },
+  "author": "Callan Peter Milne <callan.milne@eviratec.com.au>",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "2.4.3",
+    "body-parser": "1.17.1",
+    "bookshelf": "0.10.3",
+    "express": "4.15.2",
+    "knex": "0.12.7",
+    "mysql": "2.13.0"
+  }
+}

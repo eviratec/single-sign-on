@@ -1,0 +1,29 @@
+#!/usr/bin/node
+'use strict';
+
+const bodyParser = require('body-parser');
+
+const fs = require('fs');
+const express = require('express');
+
+const app = express();
+
+app.engine('html', function (filePath, options, callback) { // define the template engine
+  fs.readFile(filePath, function (err, content) {
+    if (err) return callback(err)
+    // this is an extremely simple template engine
+    var rendered = content.toString().replace('#nonce#', options.nonce)
+      .replace('#app_id#', options.app_id)
+      .replace('#error#', options.error);
+    return callback(null, rendered)
+  })
+});
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.set('views', './html');
+app.set('view engine', 'html');
+
+require('../routes')(app);
+
+app.listen(3000);
