@@ -1,6 +1,7 @@
 'use strict';
 
 const b = require('bcryptjs');
+const url = require('url');
 
 const nonce = require('./nonce');
 const db = require('./db');
@@ -23,14 +24,19 @@ module.exports = function (app) {
 
   let routes = [];
 
+  let sessionsById = {};
+
   addRoute(app.get('/', (req, res) => {
-    res.redirect(303, '/sso/auth/dialog');
+    let a = req.query.a;
+    res.redirect(303, `/sso/auth/dialog?a=${a}`);
   }));
 
   addRoute(app.get('/sso/auth/dialog', (req, res) => {
 
     let d = {
+      session_id: req.query.a,
       app_id: 'ea8e1f08-58cd-4317-9d90-2e5ace7a92a2',
+      referer: req.headers['referer'],
       error: '',
     };
 
@@ -42,11 +48,19 @@ module.exports = function (app) {
     nonce
       .create('login')
       .then((nonce) => {
+    
+        let session_id = req.cookies[SSO_COOKIE];
+
+        res.setHeader('Access-Control-Allow-Origin', '*');
+
+        if (!sessionsById[session_id]) {
+          sessionsById[session_id] = newSession(req);
+        }
 
         d.nonce = nonce.nonce;
 
-        res.cookie(SSO_COOKIE, sessionToken(), { domain: `${req.hostname}`, secure: true });
-        res.cookie(SSO_COOKIE, sessionToken(), { domain: `${req.hostname}`, http: true });
+        // res.cookie(SSO_COOKIE, session_id, { domain: `${req.hostname}`, secure: true });
+        // res.cookie(SSO_COOKIE, session_id, { domain: `${req.hostname}`, http: true });
 
         res.render('sso/auth/dialog', d);
 
@@ -61,16 +75,17 @@ module.exports = function (app) {
     let app_id = req.body.app_id;
     let user_id = req.body.user_id;
     let password = req.body.password;
+    let session_id = req.body.session_id;
+    let referer = req.body.referer;
 
     db.fetchAppUserByLogin(app_id, user_id)
       .then((appUser) => {
-        
-        console.log(appUser);
 
         let loginSuccess = b.compareSync(password, appUser.attributes.password);
         if (loginSuccess) {
           // Login success
-          return res.send(appUser);
+          startSessionFor(session_id, referer, appUser, req, res);
+          return;
         }
         
         // Login failure
@@ -90,7 +105,47 @@ module.exports = function (app) {
 
   }));
 
+  addRoute(app.get('/sso/id', (req, res) => {
+    
+    let session;
+    let referer;
+
+    let session_id = req.query.a;
+
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    session = sessionsById[session_id];
+    if (!session) {
+      session = sessionsById[session_id] = newSession(req);
+    }
+
+    referer = url.parse(req.headers['referer'] || 'http://localhost/');
+    if (referer.hostname !== url.parse(session.referer).hostname) {
+      res.status(200).send({});
+      return;
+    }
+
+    res.status(200).send(session);
+
+
+  }));
+
   return routes;
+
+  function startSessionFor (session_id, referer, appUser, req, res) {
+    
+    sessionsById[session_id].referer = referer;
+    sessionsById[session_id].anonymous = false;
+    sessionsById[session_id].login = {
+      owner: {
+        given_name: 'Callan',
+        family_name: 'Milne',
+      },
+    };
+
+    res.render('sso/auth/done', {});
+
+  }
 
   function addRoute (route) {
     routes.push(route);
@@ -104,9 +159,16 @@ module.exports = function (app) {
     return `<p class="error"><span class="material-icons">warning</span> ${_E[code].msg}</p>`;
   }
 
-  function sessionToken () {
-    let token = Date.now();
-    return `session/${token}`;
+  function newSession (req) {
+
+    let x = {
+      referer: req.headers['referer'] || 'http://localhost/',
+      loginUrl: `//${req.hostname}:3000/sso/auth/dialog?a=${req.query.a}`,
+      anonymous: true,
+    };
+
+    return x;
+
   }
 
 };

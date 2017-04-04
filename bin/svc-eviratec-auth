@@ -2,6 +2,7 @@
 'use strict';
 
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 
 const fs = require('fs');
 const express = require('express');
@@ -14,12 +15,15 @@ app.engine('html', function (filePath, options, callback) { // define the templa
     // this is an extremely simple template engine
     var rendered = content.toString().replace('#nonce#', options.nonce)
       .replace('#app_id#', options.app_id)
+      .replace('#referer#', options.referer)
+      .replace('#session_id#', options.session_id)
       .replace('#error#', options.error);
     return callback(null, rendered)
   })
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser())
 
 app.set('views', './html');
 app.set('view engine', 'html');
