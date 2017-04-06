@@ -79,13 +79,13 @@
     }
 
     div#loginForm {
-      left: 50%;
-      margin: 32px 32px 32px 0;
-      position: absolute;
-      right: 0px;
+      margin: 40px;
       background-color: rgba(255,255,255,0.5);
       padding: 24px 24px 0px;
       box-shadow: 0 1px 20px rgba(0,0,0,0.3);
+      height: 340px;
+      box-sizing: border-box;
+      width: 720px;
     }
 
     #loginForm p.error {
@@ -202,11 +202,11 @@
 
   <div class="main">
 
-    <div style="position: absolute;top: 0;left: 0;width: 40%;padding: 16px 32px;color: rgba(0,0,0,0.57);">
+    <!--<div style="position: absolute;top: 0;left: 0;width: 40%;padding: 16px 32px;color: rgba(0,0,0,0.57);">
       <h2 style="font-weight: 200;">Don't have an account yet?</h2>
       <p style="font-size: 1.2em;font-weight: 100;line-height: 1.7;">That's okay, you can <a href="#">register online</a> at any time, or contact us and we'll help you get started.</p>
       <button>Create an account</button>
-    </div>
+    </div>-->
 
     <form method="post" action="/sso/auth/attempt" enctype="application/x-www-form-urlencoded">
 

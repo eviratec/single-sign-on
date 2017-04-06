@@ -12,37 +12,34 @@ const knex = require('knex')({
 
 const bookshelf = require('bookshelf')(knex);
 
-const AppUser = bookshelf.Model.extend({
-  tableName: 'app_users'
+const User = bookshelf.Model.extend({
+  
+  tableName: 'users',
+
 });
 
 const ERR_NO_RECORDS = new Error();
 
 module.exports = {
   ERR_NO_RECORDS: ERR_NO_RECORDS,
-  fetchAppUserByLogin: function (app_id, login) {
+  fetchUserByLogin: function (login) {
 
-    let q = {limit: 1};
+    let q = { limit: 1 };
     
-    q.where = { app_id: app_id, username: login };
-
-    if (/@/.test(login)) {
-      delete q.where.username;
-      q.where.email_address = login;
-    }
+    q.where = { username: login.toLowerCase() };
 
     return new Promise((resolve, reject) => {
-      AppUser
+      User
         .query(q)
         .fetch()
-        .then((appUser) => {
+        .then((user) => {
 
-          if (null === appUser) {
+          if (null === user) {
             reject(ERR_NO_RECORDS);
             return;
           }
 
-          resolve(appUser);
+          resolve(user);
 
         });
     });

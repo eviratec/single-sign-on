@@ -59,9 +59,6 @@ module.exports = function (app) {
 
         d.nonce = nonce.nonce;
 
-        // res.cookie(SSO_COOKIE, session_id, { domain: `${req.hostname}`, secure: true });
-        // res.cookie(SSO_COOKIE, session_id, { domain: `${req.hostname}`, http: true });
-
         res.render('sso/auth/dialog', d);
 
       });
@@ -70,15 +67,13 @@ module.exports = function (app) {
 
   addRoute(app.post('/sso/auth/attempt', (req, res) => {
 
-    console.log(req.body);
-
     let app_id = req.body.app_id;
     let user_id = req.body.user_id;
     let password = req.body.password;
     let session_id = req.body.session_id;
     let referer = req.body.referer;
 
-    db.fetchAppUserByLogin(app_id, user_id)
+    db.fetchUserByLogin(app_id, user_id)
       .then((appUser) => {
 
         let loginSuccess = b.compareSync(password, appUser.attributes.password);
