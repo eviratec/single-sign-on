@@ -1,7 +1,7 @@
 # Eviratec Single Sign-On
 
-[![Dependency Status](https://david-dm.org/eviratec/entity-sdk-js/status.svg)](https://david-dm.org/eviratec/entity-sdk-js)
-[![devDependency Status](https://david-dm.org/eviratec/entity-sdk-js/dev-status.svg)](https://david-dm.org/eviratec/entity-sdk-js#info=devDependencies)
+[![Dependency Status](https://david-dm.org/eviratec/single-sign-on/status.svg)](https://david-dm.org/eviratec/single-sign-on)
+[![devDependency Status](https://david-dm.org/eviratec/single-sign-on/dev-status.svg)](https://david-dm.org/eviratec/single-sign-on#info=devDependencies)
 
 This repository contains the source for the Eviratec Single Sign-On dialog.
 
